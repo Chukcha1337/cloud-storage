@@ -1,4 +1,4 @@
-package com.chuckcha.cloudfilestorage.filter;
+package com.chuckcha.cloudfilestorage.security.filter;
 
 import com.chuckcha.cloudfilestorage.dto.UserCreateDto;
 import com.chuckcha.cloudfilestorage.dto.UserLoginDto;
@@ -27,7 +27,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends AbstractAuthentica
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException, IOException {
-        if (!request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+        if (request.getContentType() == null || !request.getContentType().startsWith(MediaType.APPLICATION_JSON_VALUE)) {
             throw new AuthenticationServiceException("Only application/json content type is supported");
         }
         UserLoginDto userLoginDto = objectMapper.readValue(request.getInputStream(), UserLoginDto.class);

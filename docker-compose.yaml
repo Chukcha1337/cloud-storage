@@ -1,4 +1,11 @@
 services:
+  redis:
+    image: redis:7
+    container_name: filestorage-redis
+    ports:
+      - "6379:6379"
+    restart: always
+
   db:
     image: postgres:17
     container_name: filestorage-postgres
@@ -18,12 +25,15 @@ services:
     restart: always
     depends_on:
       - db
+      - redis
     environment:
       DB_URL: ${DB_URL}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "8084:8080"
+    volumes:
+      - ./logs:/app/logs
 
 volumes:
   db_data:

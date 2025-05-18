@@ -1,4 +1,4 @@
-package com.chuckcha.cloudfilestorage.security;
+package com.chuckcha.cloudfilestorage.security.model;
 
 import com.chuckcha.cloudfilestorage.entity.User;
 import lombok.RequiredArgsConstructor;
