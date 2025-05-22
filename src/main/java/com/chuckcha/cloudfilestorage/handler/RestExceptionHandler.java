@@ -1,5 +1,6 @@
 package com.chuckcha.cloudfilestorage.handler;
 
+import com.chuckcha.cloudfilestorage.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -20,38 +21,38 @@ public class RestExceptionHandler {
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
-    public Map<String, String> handleDuplicateKey(DuplicateKeyException ex) {
-        return Map.of("message", ex.getMessage());
+    public ErrorResponse handleDuplicateKey(DuplicateKeyException ex) {
+        return new ErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    public Map<String, String> handleUserNotFound(UsernameNotFoundException ex) {
-        return Map.of("message", ex.getMessage());
+    public ErrorResponse handleUserNotFound(UsernameNotFoundException ex) {
+        return new ErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Map<String, String> handleValidation(MethodArgumentNotValidException ex) {
+    public ErrorResponse handleValidation(MethodArgumentNotValidException ex) {
         var fieldError = ex.getBindingResult().getFieldError();
         var message = fieldError != null ? fieldError.getDefaultMessage() : "Validation error";
-        return Map.of("message", message);
+        return new ErrorResponse(message);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public Map<String, String> handleOther(Exception ex) {
+    public ErrorResponse handleOther(Exception ex) {
         log.error("Unexpected error", ex);
-        return Map.of("message", "Internal server error");
+        return new ErrorResponse("Internal Server Error");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
-    public Map<String, String> handleAccessDenied(AccessDeniedException ex) {
-        return Map.of("message", "Access denied");
+    public ErrorResponse handleAccessDenied() {
+        return new ErrorResponse("Access denied");
     }
 }

@@ -1,14 +1,11 @@
 package com.chuckcha.cloudfilestorage.config;
 
-import com.chuckcha.cloudfilestorage.security.entryPoint.JsonAuthenticationEntryPoint;
 import com.chuckcha.cloudfilestorage.security.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.chuckcha.cloudfilestorage.security.filter.UnauthorizedLogoutFilter;
 import com.chuckcha.cloudfilestorage.security.handler.JsonAuthenticationFailureHandler;
 import com.chuckcha.cloudfilestorage.security.handler.JsonAuthenticationSuccessHandler;
-import com.chuckcha.cloudfilestorage.security.handler.JsonLogoutSuccessHandler;
+import com.chuckcha.cloudfilestorage.util.JsonResponseHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +15,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -28,11 +24,9 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
-
-import java.io.IOException;
 
 @Configuration
 @EnableMethodSecurity
@@ -40,12 +34,10 @@ import java.io.IOException;
 public class SecurityConfiguration {
 
     private static final String LOGOUT_PATH = "/api/auth/sign-out";
-    private static final String LOGIN_PATH = "/api/auth/sign-out";
-    private static final String REGISTER_PATH = "/api/auth/sign-out";
-
-    private final ObjectMapper objectMapper;
-    private final AuthenticationConfiguration authenticationConfiguration;
-    private final JsonAuthenticationEntryPoint authenticationEntryPoint;
+    private static final String LOGIN_PATH = "/api/auth/sign-in";
+    private static final String REGISTER_PATH = "/api/auth/sign-up";
+    private static final String DOCS_PATH = "/v3/api-docs/**";
+    private static final String SWAGGER_PATH = "/swagger-ui/**";
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -63,55 +55,61 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager() throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
     public AuthenticationSuccessHandler jsonAuthenticationSuccessHandler(
             SecurityContextRepository securityContextRepository,
-            SecurityContextHolderStrategy securityContextHolderStrategy) {
-        return new JsonAuthenticationSuccessHandler(objectMapper, securityContextRepository, securityContextHolderStrategy);
+            SecurityContextHolderStrategy securityContextHolderStrategy,
+            JsonResponseHandler jsonResponseHandler) {
+        return new JsonAuthenticationSuccessHandler(securityContextRepository, securityContextHolderStrategy, jsonResponseHandler);
     }
 
     @Bean
-    public AuthenticationFailureHandler jsonAuthenticationFailureHandler() {
-        return new JsonAuthenticationFailureHandler(objectMapper);}
+    public AuthenticationFailureHandler jsonAuthenticationFailureHandler(JsonResponseHandler jsonResponseHandler) {
+        return new JsonAuthenticationFailureHandler(jsonResponseHandler);}
 
     @Bean
-    public LogoutSuccessHandler jsonLogoutSuccessHandler(SecurityContextHolderStrategy securityContextHolderStrategy) {
-        return new JsonLogoutSuccessHandler(objectMapper, securityContextHolderStrategy);
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter,
-                                                   LogoutSuccessHandler jsonLogoutSuccessHandler
-                                                   ) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(urlConfig -> urlConfig
-                        .requestMatchers("/api/auth/sign-up", "/api/auth/sign-in", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/api/auth/sign-out").authenticated()
-                        .anyRequest().authenticated())
-                .addFilterAt(jsonUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/sign-out")
-                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
-                        .deleteCookies("JSESSIONID"))
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(authenticationEntryPoint))
-                .build();
+    public UnauthorizedLogoutFilter unauthorizedLogoutFilter(
+            SecurityContextHolderStrategy securityContextHolderStrategy,
+            JsonResponseHandler jsonResponseHandler) {
+        return new UnauthorizedLogoutFilter(LOGOUT_PATH, jsonResponseHandler, securityContextHolderStrategy);
     }
 
     @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager,
                                                                                              AuthenticationSuccessHandler jsonAuthenticationSuccessHandler,
-                                                                                             AuthenticationFailureHandler jsonAuthenticationFailureHandler) throws Exception {
-        var filter = new JsonUsernamePasswordAuthenticationFilter(objectMapper);
+                                                                                             AuthenticationFailureHandler jsonAuthenticationFailureHandler,
+                                                                                             JsonResponseHandler jsonResponseHandler) throws Exception {
+        var filter = new JsonUsernamePasswordAuthenticationFilter(jsonResponseHandler);
         filter.setAuthenticationManager(authenticationManager);
         filter.setAuthenticationSuccessHandler(jsonAuthenticationSuccessHandler);
         filter.setAuthenticationFailureHandler(jsonAuthenticationFailureHandler);
         return filter;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter,
+                                                   UnauthorizedLogoutFilter unauthorizedLogoutFilter,
+                                                   SecurityContextRepository securityContextRepository
+                                                   ) throws Exception {
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .securityContext(context -> context
+                        .securityContextRepository(securityContextRepository))
+                .authorizeHttpRequests(urlConfig -> urlConfig
+                        .requestMatchers(REGISTER_PATH, LOGIN_PATH, DOCS_PATH, SWAGGER_PATH).permitAll()
+                        .requestMatchers(LOGOUT_PATH).authenticated()
+                        .anyRequest().authenticated())
+                .addFilterAt(jsonUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(unauthorizedLogoutFilter, LogoutFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl(LOGOUT_PATH)
+                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+                        .deleteCookies("JSESSIONID"))
+                .build();
     }
 }

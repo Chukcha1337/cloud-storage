@@ -7,24 +7,30 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 public class UnauthorizedLogoutFilter extends OncePerRequestFilter {
 
-    private final ObjectMapper objectMapper;
+    private final String logoutPath;
     private final JsonResponseHandler jsonResponseHandler;
+    private final SecurityContextHolderStrategy securityContextHolderStrategy;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -33,20 +39,20 @@ public class UnauthorizedLogoutFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
 
-        if (LOGOUT_PATH.equals(request.getRequestURI()) && "POST".equalsIgnoreCase(request.getMethod())) {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+log.info(securityContextHolderStrategy.toString());
+        Authentication auth = securityContextHolderStrategy.getContext().getAuthentication();
 
-            boolean isAnonymous = auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken;
+        boolean isLogoutRequest = request.getMethod().equalsIgnoreCase("POST")
+                                  && request.getRequestURI().equals(logoutPath);
+        boolean isAnonymous = auth == null
+                              || !auth.isAuthenticated()
+                              || auth instanceof AnonymousAuthenticationToken;
 
-            if (isAnonymous) {
-
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                objectMapper.writeValue(response.getWriter(), Map.of("message", "Only authenticated users can logout"));
-                return;
-            }
+        if (isLogoutRequest && isAnonymous) {
+            jsonResponseHandler.writeJsonResponse(response, HttpStatus.UNAUTHORIZED, "User must be authorized to logout");
+            return;
         }
         filterChain.doFilter(request, response);
-
     }
 }
+

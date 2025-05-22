@@ -11,15 +11,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class JsonResponseHandler {
 
     private final ObjectMapper objectMapper;
-//
-//    public <T> T readValue(InputStream inputStream, Class<T> valueType) throws IOException {
-//        return objectMapper.readValue(inputStream, valueType);
-//    }
+
+    public <T> T readValue(InputStream inputStream, Class<T> valueType) throws IOException {
+        return objectMapper.readValue(inputStream, valueType);
+    }
 
     public <T> void writeJsonResponse(HttpServletResponse response, HttpStatus status, T body) throws IOException {
         response.setStatus(status.value());

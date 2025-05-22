@@ -7,6 +7,7 @@ import com.chuckcha.cloudfilestorage.mapper.UserMapper;
 import com.chuckcha.cloudfilestorage.repository.UserRepository;
 import com.chuckcha.cloudfilestorage.security.model.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
