@@ -1,6 +1,7 @@
 package com.chuckcha.cloudfilestorage.handler;
 
-import com.chuckcha.cloudfilestorage.dto.ErrorResponse;
+import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -35,10 +34,17 @@ public class RestExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleValidation(MethodArgumentNotValidException ex) {
+    public ErrorResponse handleRegistrationValidation(MethodArgumentNotValidException ex) {
         var fieldError = ex.getBindingResult().getFieldError();
         var message = fieldError != null ? fieldError.getDefaultMessage() : "Validation error";
         return new ErrorResponse(message);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleLoginValidation(ConstraintViolationException ex) {
+        return new ErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

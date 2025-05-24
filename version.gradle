@@ -1,0 +1,6 @@
+ext {
+    set('assertjVersion', "3.27.3")
+    set('restAssuredVersion', "5.5.2")
+    set('springCloudVersion', "2024.0.1")
+    set('mapstructVersion', "1.5.5.Final")
+}

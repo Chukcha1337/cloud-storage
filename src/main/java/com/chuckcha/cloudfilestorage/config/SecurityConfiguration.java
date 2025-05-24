@@ -5,6 +5,7 @@ import com.chuckcha.cloudfilestorage.security.filter.UnauthorizedLogoutFilter;
 import com.chuckcha.cloudfilestorage.security.handler.JsonAuthenticationFailureHandler;
 import com.chuckcha.cloudfilestorage.security.handler.JsonAuthenticationSuccessHandler;
 import com.chuckcha.cloudfilestorage.util.JsonResponseHandler;
+import com.chuckcha.cloudfilestorage.validation.RequestValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -82,8 +83,9 @@ public class SecurityConfiguration {
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager,
                                                                                              AuthenticationSuccessHandler jsonAuthenticationSuccessHandler,
                                                                                              AuthenticationFailureHandler jsonAuthenticationFailureHandler,
-                                                                                             JsonResponseHandler jsonResponseHandler) throws Exception {
-        var filter = new JsonUsernamePasswordAuthenticationFilter(jsonResponseHandler);
+                                                                                             JsonResponseHandler jsonResponseHandler,
+                                                                                             RequestValidator requestValidator) throws Exception {
+        var filter = new JsonUsernamePasswordAuthenticationFilter(jsonResponseHandler, requestValidator);
         filter.setAuthenticationManager(authenticationManager);
         filter.setAuthenticationSuccessHandler(jsonAuthenticationSuccessHandler);
         filter.setAuthenticationFailureHandler(jsonAuthenticationFailureHandler);

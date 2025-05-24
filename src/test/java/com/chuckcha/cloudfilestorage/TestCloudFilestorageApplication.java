@@ -1,5 +1,6 @@
 package com.chuckcha.cloudfilestorage;
 
+import com.chuckcha.cloudfilestorage.config.TestcontainersConfiguration;
 import org.springframework.boot.SpringApplication;
 
 public class TestCloudFilestorageApplication {
