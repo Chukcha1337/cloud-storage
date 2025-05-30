@@ -46,7 +46,6 @@ class UserServiceTest {
 
     @Test
     void create() {
-        Mockito.doReturn(Optional.of(new User()));
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.chuckcha.cloudfilestorage.security.filter;
 
+import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
+import com.chuckcha.cloudfilestorage.security.service.SecurityContextService;
 import com.chuckcha.cloudfilestorage.util.JsonResponseHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -30,7 +32,7 @@ public class UnauthorizedLogoutFilter extends OncePerRequestFilter {
 
     private final String logoutPath;
     private final JsonResponseHandler jsonResponseHandler;
-    private final SecurityContextHolderStrategy securityContextHolderStrategy;
+    private final SecurityContextService securityContextService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -38,20 +40,16 @@ public class UnauthorizedLogoutFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-
-log.info(securityContextHolderStrategy.toString());
-        Authentication auth = securityContextHolderStrategy.getContext().getAuthentication();
-
         boolean isLogoutRequest = request.getMethod().equalsIgnoreCase("POST")
                                   && request.getRequestURI().equals(logoutPath);
-        boolean isAnonymous = auth == null
-                              || !auth.isAuthenticated()
-                              || auth instanceof AnonymousAuthenticationToken;
 
-        if (isLogoutRequest && isAnonymous) {
-            jsonResponseHandler.writeJsonResponse(response, HttpStatus.UNAUTHORIZED, "User must be authorized to logout");
+        if (isLogoutRequest && !securityContextService.isAuthenticated()) {
+            jsonResponseHandler.writeJsonResponse(response,
+                    HttpStatus.UNAUTHORIZED,
+                    new ErrorResponse("Not authenticated users are not allowed to perform logout."));
             return;
         }
+
         filterChain.doFilter(request, response);
     }
 }

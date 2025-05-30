@@ -1,4 +1,4 @@
 package com.chuckcha.cloudfilestorage.dto.response;
 
-public record UserResponse(String username) {
+public record UserResponse(String username) implements Response {
 }

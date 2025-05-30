@@ -1,12 +1,15 @@
 package com.chuckcha.cloudfilestorage.handler;
 
 import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
+import com.chuckcha.cloudfilestorage.exception.DataNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,10 +27,17 @@ public class RestExceptionHandler {
         return new ErrorResponse(ex.getMessage());
     }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
+    @ExceptionHandler({UsernameNotFoundException.class, BadCredentialsException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    public ErrorResponse handleUserNotFound(UsernameNotFoundException ex) {
+    public ErrorResponse handleAuthFailures(Exception ex) {
+        return new ErrorResponse("Invalid username or password");
+    }
+
+    @ExceptionHandler(DataNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public ErrorResponse handleDataNotFound(DataNotFoundException ex) {
         return new ErrorResponse(ex.getMessage());
     }
 
@@ -40,10 +50,10 @@ public class RestExceptionHandler {
         return new ErrorResponse(message);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler(RequestRejectedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleLoginValidation(ConstraintViolationException ex) {
+    public ErrorResponse handleBadRequest(Exception ex) {
         return new ErrorResponse(ex.getMessage());
     }
 

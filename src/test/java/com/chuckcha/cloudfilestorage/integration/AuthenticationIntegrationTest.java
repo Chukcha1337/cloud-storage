@@ -1,4 +1,4 @@
-package com.chuckcha.cloudfilestorage;
+package com.chuckcha.cloudfilestorage.integration;
 
 import com.chuckcha.cloudfilestorage.dto.request.UserRegistrationRequest;
 import com.chuckcha.cloudfilestorage.dto.request.UserLoginRequest;
@@ -59,6 +59,22 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
         ErrorResponse errorResponse = userLoginResponse.then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.message()).isNotNull().isNotBlank();
+    }
+
+    @DisplayName("No such valid user at database test")
+    @ParameterizedTest(name = "Authentication of user {0}")
+    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUsers#validLoginUsers")
+    public void shouldNotAuthenticateUnregisteredUser(UserLoginRequest loginUser) {
+
+        Response userLoginResponse = given()
+                .contentType(ContentType.JSON).body(loginUser)
+                .when().post("/api/auth/sign-in");
+
+        ErrorResponse errorResponse = userLoginResponse.then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .extract().as(ErrorResponse.class);
 
         assertThat(errorResponse.message()).isNotNull().isNotBlank();

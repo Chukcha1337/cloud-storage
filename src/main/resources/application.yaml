@@ -11,6 +11,13 @@ server:
       timeout: 30m
   port: 8085
 
+minio:
+  url: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket-name: user-files
+  root-user-directory: user-%d-files/
+
 spring:
   profiles:
     active: prod

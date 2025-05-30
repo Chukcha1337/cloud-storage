@@ -1,7 +1,9 @@
 package com.chuckcha.cloudfilestorage.controller;
 
+import com.chuckcha.cloudfilestorage.dto.request.UserLoginRequest;
 import com.chuckcha.cloudfilestorage.dto.request.UserRegistrationRequest;
 import com.chuckcha.cloudfilestorage.dto.response.UserResponse;
+import com.chuckcha.cloudfilestorage.security.service.AuthenticationService;
 import com.chuckcha.cloudfilestorage.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,51 +26,29 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
-    private final SecurityContextRepository securityContextRepository;
-    private final SecurityContextHolderStrategy securityContextHolderStrategy;
+    private final AuthenticationService authenticationService;
 
-    @PostMapping(value ="/sign-up", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> register(
-            @Validated @RequestBody UserRegistrationRequest userDto,
+    @PostMapping(value = "/sign-up", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse register(
+            @Validated @RequestBody UserRegistrationRequest userRequest,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-            UserResponse dto = userService.create(userDto);
-
-        var authRequest = new UsernamePasswordAuthenticationToken(
-                userDto.username(),
-                userDto.rawPassword()
-        );
-        Authentication authentication = authenticationManager.authenticate(authRequest);
-
-        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
-        context.setAuthentication(authentication);
-        securityContextHolderStrategy.setContext(context);
-
-        securityContextRepository.saveContext(context, request, response);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        UserResponse userResponse = userService.create(userRequest);
+        authenticationService.authenticateAndLogin(userRequest.username(), userRequest.rawPassword(), request, response);
+        return userResponse;
     }
 
-    @PostMapping(value ="/sign-in", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> authenticate(
-            @Validated @RequestBody UserRegistrationRequest userDto,
+    @PostMapping(value = "/sign-in", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public UserResponse authenticate(
+            @Validated @RequestBody UserLoginRequest userRequest,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        var authRequest = new UsernamePasswordAuthenticationToken(
-                userDto.username(),
-                userDto.rawPassword()
-        );
-        Authentication authentication = authenticationManager.authenticate(authRequest);
-
-        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
-        context.setAuthentication(authentication);
-        securityContextHolderStrategy.setContext(context);
-
-        securityContextRepository.saveContext(context, request, response);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        UserResponse userResponse = new UserResponse(userRequest.username());
+        authenticationService.authenticateAndLogin(userRequest.username(), userRequest.password(), request, response);
+        return userResponse;
     }
 }

@@ -48,4 +48,8 @@ public class TestUsers {
                 .map(r -> new UserLoginRequest(r.username(), r.rawPassword()));
     }
 
+    public static UserLoginRequest toLoginUser(UserRegistrationRequest userRegistrationRequest) {
+        return new UserLoginRequest(userRegistrationRequest.username(), userRegistrationRequest.rawPassword());
+    }
+
 }

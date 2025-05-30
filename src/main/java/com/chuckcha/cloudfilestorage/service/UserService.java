@@ -32,13 +32,15 @@ public class UserService implements UserDetailsService {
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.rawPassword()));
 
+        //TODO: реализовать создание директории user-%d-files/
+
         return mapper.toDto(userRepository.save(user));
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
-                .map(UserDetailsImpl::new)
+                .map(UserDetailsImpl::from)
                 .orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user: " + username));
     }
 }

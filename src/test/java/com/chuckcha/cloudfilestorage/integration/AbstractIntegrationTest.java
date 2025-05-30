@@ -1,4 +1,4 @@
-package com.chuckcha.cloudfilestorage;
+package com.chuckcha.cloudfilestorage.integration;
 
 import com.chuckcha.cloudfilestorage.config.TestcontainersConfiguration;
 import com.chuckcha.cloudfilestorage.repository.UserRepository;

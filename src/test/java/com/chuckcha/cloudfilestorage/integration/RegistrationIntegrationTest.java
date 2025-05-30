@@ -1,4 +1,4 @@
-package com.chuckcha.cloudfilestorage;
+package com.chuckcha.cloudfilestorage.integration;
 
 import com.chuckcha.cloudfilestorage.dto.request.UserRegistrationRequest;
 import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
@@ -72,8 +72,6 @@ public class RegistrationIntegrationTest extends AbstractIntegrationTest {
         given().contentType(ContentType.JSON).body(testUser)
                 .when().post("/api/auth/sign-up")
                 .then().statusCode(HttpStatus.CONFLICT.value());
-
-
     }
 
     @Test
