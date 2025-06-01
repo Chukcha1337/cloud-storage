@@ -1,4 +1,4 @@
 package com.chuckcha.cloudfilestorage.dto.response;
 
-public record ErrorResponse(String message) implements Response {
+public record ErrorResponse(String message) {
 }

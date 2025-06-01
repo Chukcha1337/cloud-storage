@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 @Getter
 @AllArgsConstructor
-public class DuplicateResponse implements Response {
+public class DuplicateResponse {
     private String path;
     private String name;
 

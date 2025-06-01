@@ -1,11 +1,11 @@
 package com.chuckcha.cloudfilestorage.service;
 
-import com.chuckcha.cloudfilestorage.dto.response.DuplicateResponse;
 import com.chuckcha.cloudfilestorage.dto.response.MetadataResponse;
-import com.chuckcha.cloudfilestorage.dto.response.Response;
 import com.chuckcha.cloudfilestorage.entity.Type;
+import com.chuckcha.cloudfilestorage.util.FileValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,14 +18,12 @@ import static com.chuckcha.cloudfilestorage.util.PathDataHandler.*;
 @RequiredArgsConstructor
 public class FileService {
 
-    @Value("${minio.bucket-name}")
-    private String bucket;
-
     @Value("${minio.root-user-directory}")
     private String rootUserDirectoryPattern;
 
     private final MetadataService metadataService;
     private final MinioService minioService;
+    private final FileValidator fileValidator;
 
     public MetadataResponse get(Long userId, String path) {
         String fullPath = rootUserDirectoryPattern.formatted(userId) + path;
@@ -40,43 +38,32 @@ public class FileService {
     @Transactional
     public void delete(Long userId, String path) {
         String fullPath = rootUserDirectoryPattern.formatted(userId) + path;
-            metadataService.delete(extractActualPath(fullPath),
-                    extractName(fullPath),
-                    extractType(fullPath));
+        metadataService.delete(extractActualPath(fullPath),
+                extractName(fullPath),
+                extractType(fullPath));
         minioService.delete(fullPath);
-
     }
 
     @Transactional
-    public List<Response> uploadFiles(Long userId, String path, MultipartFile[] files) {
+    public List<MetadataResponse> uploadFiles(Long userId, String path, MultipartFile[] files) {
 
-        List<Response> responses = new ArrayList<>();
+        List<MetadataResponse> responses = new ArrayList<>();
         String fullPath = rootUserDirectoryPattern.formatted(userId) + path;
+
+        fileValidator.validateFiles(files, fullPath);
 
         Map<String, String> pathFolders = extractFolders(fullPath);
         pathFolders.forEach(metadataService::createFolderIfNotExists);
 
         for (MultipartFile file : files) {
             String pathAndName = file.getOriginalFilename();
-            if (pathAndName == null || pathAndName.isBlank()) {
-                throw new IllegalArgumentException("File name cannot be null or empty");
-            }
-
-            Map<String, String> filenameFolders = extractFolders(pathAndName);
-            filenameFolders.forEach((folderPath, folderName) ->
-                    metadataService.createFolderIfNotExists(fullPath + folderPath, folderName));
-
             String fullFileName = fullPath + pathAndName;
 
-            if (metadataService.exists(extractActualPath(fullFileName), extractName(fullFileName), Type.FILE)) {
-                responses.add(DuplicateResponse.builder()
-                        .path(extractActualPath(fullFileName))
-                        .name(extractName(fullFileName))
-                        .build());
-                continue;
-            }
+            Map<String, String> fileNameFolders = extractFolders(pathAndName);
+            fileNameFolders.forEach((folderPath, folderName) ->
+                    metadataService.createFolderIfNotExists(fullPath + folderPath, folderName));
 
-            minioService.upload(bucket, fullFileName, file);
+            minioService.upload(fullFileName, file);
             responses.add(metadataService.save(fullFileName, file));
         }
         return responses;
