@@ -1,29 +1,37 @@
 package com.chuckcha.cloudfilestorage.service;
 
 import com.chuckcha.cloudfilestorage.entity.Type;
+import com.chuckcha.cloudfilestorage.exception.DataNotFoundException;
 import com.chuckcha.cloudfilestorage.exception.MinioDeleteObjectException;
 import com.chuckcha.cloudfilestorage.exception.MinioDownloadException;
 import com.chuckcha.cloudfilestorage.exception.MinioUploadException;
 import com.chuckcha.cloudfilestorage.util.PathDataHandler;
+import com.chuckcha.cloudfilestorage.util.ZipStreamWriter;
 import io.minio.*;
-import io.minio.errors.MinioException;
+import io.minio.errors.*;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static com.chuckcha.cloudfilestorage.util.PathDataHandler.extractType;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MinioService {
@@ -47,72 +55,80 @@ public class MinioService {
         }
     }
 
-    public InputStream download(String objectName) {
-        if (extractType(objectName).equals(Type.FILE)) {
-            try  {
-                InputStream stream = minioClient.getObject(
+    public ResponseEntity<?> download(String objectName) throws IOException {
+        return switch (extractType(objectName)) {
+            case FILE -> downloadFile(objectName);
+            case DIRECTORY -> downloadDirectoryAsZip(objectName);
+        };
+    }
+
+    private InputStream downloadDirectoryAsZip(String dirName) {
+        List<String> objectNames = listObjectNames(dirName);
+        try (ZipStreamWriter zip = new ZipStreamWriter(outputStream)) {
+            for (String name : objectNames) {
+                String entryName = name.substring(dirName.length());
+                try (InputStream stream = minioClient.getObject(
                         GetObjectArgs.builder()
-                                .bucket(bucket)
-                                .object(objectName)
-                                .build());
-               return stream;
-            }
-            catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
-                throw new MinioDownloadException("Failed to download file %s".formatted(objectName), e);
-            }
-        } else if (extractType(objectName).equals(Type.DIRECTORY)) {
-            Iterable<Result<Item>> results = minioClient.listObjects(
-                    ListObjectsArgs.builder()
-                            .bucket(bucket)
-                            .prefix(objectName)
-                            .recursive(true)
-                            .build());
-
-            List<String> objectsToDownload = new ArrayList<>();
-
-            for (Result<Item> result : results) {
-                try {
-                    objectsToDownload.add(result.get().objectName());
-                } catch (Exception e) {
-                    throw new MinioDeleteObjectException("Failed to find objects to remove", e);
+                                .bucket("my-bucketname")
+                                .object("my-objectname")
+                                .build())) {
+                    zip.addFile(entryName, stream);
                 }
             }
-
-
-
-
-
-
-
+            return new ByteArrayInputStream(zip.);
+        } catch (IOException e) {
+            throw new MinioDownloadException("Failed to zip directory: %s".formatted(dirName), e);
         }
+    }
 
 
+    private InputStream downloadFile(String objectName) {
+        try {
+            return minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectName)
+                            .build());
+        } catch (Exception e) {
+            throw new MinioDownloadException("Failed to download file %s".formatted(objectName), e);
+        }
     }
 
     public void delete(String prefix) {
-        Iterable<Result<Item>> results = minioClient.listObjects(
-                ListObjectsArgs.builder()
+        List<DeleteObject> toDelete = listObjectNames(prefix)
+                .stream()
+                .map(DeleteObject::new)
+                .toList();
+
+        minioClient.removeObjects(
+                RemoveObjectsArgs.builder()
                         .bucket(bucket)
-                        .prefix(prefix)
-                        .recursive(true)
+                        .objects(toDelete)
                         .build());
+    }
 
-        List<DeleteObject> objectsToDelete = new ArrayList<>();
 
-        for (Result<Item> result : results) {
-            try {
-                objectsToDelete.add(new DeleteObject(result.get().objectName()));
-            } catch (Exception e) {
-                throw new MinioDeleteObjectException("Failed to find objects to remove", e);
-            }
-        }
-
-        if (!objectsToDelete.isEmpty()) {
-            minioClient.removeObjects(
-                    RemoveObjectsArgs.builder()
+    private List<String> listObjectNames(String prefix) {
+        try {
+            Iterable<Result<Item>> results = minioClient.listObjects(
+                    ListObjectsArgs.builder()
                             .bucket(bucket)
-                            .objects(objectsToDelete)
+                            .prefix(prefix)
+                            .recursive(true)
                             .build());
+
+            List<String> names = new ArrayList<>();
+            for (Result<Item> result : results) {
+                names.add(result.get().objectName());
+            }
+
+            if (names.isEmpty()) {
+                throw new DataNotFoundException("No data found to list");
+            }
+            return names;
+        } catch (Exception e) {
+            throw new MinioDownloadException("Failed to retrieve object names with prefix: " + prefix, e);
         }
     }
 }
+

@@ -8,12 +8,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
 
@@ -41,8 +44,7 @@ public class FileController {
     }
 
     @GetMapping(value = "download/", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public InputStreamResource downloadData(
+    public ResponseEntity<?> download(
             @RequestParam
             @NotBlank(message = "Path cannot be empty")
             @Pattern(
@@ -52,7 +54,11 @@ public class FileController {
             String path,
             @AuthenticationPrincipal UserDetailsImpl user
     ) {
-        return fileService.download(user.getId(), path);
+        Object responce = fileService.download(user.getId(), path);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(responce);
+                
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
