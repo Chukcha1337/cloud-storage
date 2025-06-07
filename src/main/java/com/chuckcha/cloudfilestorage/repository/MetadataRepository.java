@@ -13,7 +13,7 @@ public interface MetadataRepository extends JpaRepository<Metadata, Long> {
 
     Optional<Metadata> findByPathAndNameAndType(String path, String name, Type type);
 
-    Optional<Metadata> save (Metadata metadata);
+    List<Metadata> findAllByNameContains(String name);
 
     boolean existsByPathAndNameAndType(String path, String name, Type type);
 
@@ -22,4 +22,14 @@ public interface MetadataRepository extends JpaRepository<Metadata, Long> {
     @Modifying
     @Query("DELETE FROM Metadata m WHERE m.path LIKE CONCAT(:path,'%')")
     void deleteAllByPathStartingWith(String path);
+
+    @Query("SELECT m FROM Metadata m WHERE m.path LIKE CONCAT(:path,'%')")
+    List<Metadata> findAllByPathStartsWith(String path);
+
+    @Query("SELECT m FROM Metadata m " +
+           "WHERE m.path LIKE CONCAT(:userDirectory,'%') " +
+           "AND LOWER(m.name) LIKE LOWER(CONCAT('%', :request, '%'))")
+    List<Metadata> search(String userDirectory, String request);
+
+    List<Metadata> findAllByPath(String path);
 }

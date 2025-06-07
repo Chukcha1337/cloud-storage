@@ -19,5 +19,9 @@ minio:
   root-user-directory: user-%d-files/
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
   profiles:
     active: prod

@@ -1,35 +1,25 @@
 package com.chuckcha.cloudfilestorage.service;
 
+import com.chuckcha.cloudfilestorage.dto.request.MetadataRequest;
 import com.chuckcha.cloudfilestorage.entity.Type;
 import com.chuckcha.cloudfilestorage.exception.DataNotFoundException;
-import com.chuckcha.cloudfilestorage.exception.MinioDeleteObjectException;
 import com.chuckcha.cloudfilestorage.exception.MinioDownloadException;
+import com.chuckcha.cloudfilestorage.exception.MinioMoveException;
 import com.chuckcha.cloudfilestorage.exception.MinioUploadException;
-import com.chuckcha.cloudfilestorage.util.PathDataHandler;
 import com.chuckcha.cloudfilestorage.util.ZipStreamWriter;
 import io.minio.*;
-import io.minio.errors.*;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-import static com.chuckcha.cloudfilestorage.util.PathDataHandler.extractType;
 
 @Slf4j
 @Service
@@ -55,40 +45,33 @@ public class MinioService {
         }
     }
 
-    public ResponseEntity<?> download(String objectName) throws IOException {
-        return switch (extractType(objectName)) {
-            case FILE -> downloadFile(objectName);
-            case DIRECTORY -> downloadDirectoryAsZip(objectName);
-        };
-    }
 
-    private InputStream downloadDirectoryAsZip(String dirName) {
+    public void writeDirectoryToStream(String dirName, OutputStream outputStream) throws IOException {
         List<String> objectNames = listObjectNames(dirName);
         try (ZipStreamWriter zip = new ZipStreamWriter(outputStream)) {
             for (String name : objectNames) {
-                String entryName = name.substring(dirName.length());
                 try (InputStream stream = minioClient.getObject(
                         GetObjectArgs.builder()
-                                .bucket("my-bucketname")
-                                .object("my-objectname")
+                                .bucket(bucket)
+                                .object(name)
                                 .build())) {
+                    String entryName = name.substring(dirName.length());
                     zip.addFile(entryName, stream);
                 }
             }
-            return new ByteArrayInputStream(zip.);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new MinioDownloadException("Failed to zip directory: %s".formatted(dirName), e);
         }
     }
 
 
-    private InputStream downloadFile(String objectName) {
-        try {
-            return minioClient.getObject(
-                    GetObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(objectName)
-                            .build());
+    public void writeFileToStream(String objectName, OutputStream outputStream) throws IOException {
+        try (InputStream inputStream = minioClient.getObject(
+                GetObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(objectName)
+                        .build());) {
+            inputStream.transferTo(outputStream);
         } catch (Exception e) {
             throw new MinioDownloadException("Failed to download file %s".formatted(objectName), e);
         }
@@ -106,7 +89,6 @@ public class MinioService {
                         .objects(toDelete)
                         .build());
     }
-
 
     private List<String> listObjectNames(String prefix) {
         try {
@@ -130,5 +112,62 @@ public class MinioService {
             throw new MinioDownloadException("Failed to retrieve object names with prefix: " + prefix, e);
         }
     }
+
+    public void updateFile(MetadataRequest requestFrom, MetadataRequest requestTo) {
+        try {
+            minioClient.copyObject(
+                    CopyObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(requestTo.fullPath())
+                            .source(
+                                    CopySource.builder()
+                                            .bucket(bucket)
+                                            .object(requestFrom.fullPath())
+                                            .build())
+                            .build());
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(requestFrom.fullPath())
+                            .build());
+        } catch (
+                Exception e) {
+            throw new MinioMoveException("Failed to move object: " + requestFrom.name(), e);
+        }
+    }
+
+
+    public void updateDir(MetadataRequest requestFrom, MetadataRequest requestTo) {
+        String currentDirPath = requestFrom.fullPath();
+        String newDirPath = requestTo.fullPath();
+        List<String> objectsToMove = listObjectNames(currentDirPath);
+        List<String> copiedObjects = new ArrayList<>();
+        try {
+            for (String name : objectsToMove) {
+                String newName = newDirPath.concat(name.substring(currentDirPath.length()));
+                minioClient.copyObject(
+                        CopyObjectArgs.builder()
+                                .bucket(bucket)
+                                .object(newName)
+                                .source(
+                                        CopySource.builder()
+                                                .bucket(bucket)
+                                                .object(name)
+                                                .build())
+                                .build());
+                copiedObjects.add(newName);
+                log.info("Moving object: {} → {}", name, newName);
+            }
+            if (copiedObjects.size() == objectsToMove.size()) {
+                delete(currentDirPath);
+            } else {
+                throw new MinioMoveException("Not all files copied. Aborting delete.");
+            }
+        } catch (Exception e) {
+            throw new MinioMoveException("Failed to move object names with prefix: " + currentDirPath, e);
+        }
+    }
 }
+
+
 

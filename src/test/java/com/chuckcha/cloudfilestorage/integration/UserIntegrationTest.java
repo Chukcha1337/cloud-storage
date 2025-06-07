@@ -1,8 +1,8 @@
 package com.chuckcha.cloudfilestorage.integration;
 
+import com.chuckcha.cloudfilestorage.dto.response.UserResponse;
 import com.chuckcha.cloudfilestorage.util.TestUsers;
 import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,7 @@ import java.util.Map;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UserControllerIntegrationTest extends AbstractIntegrationTest {
+public class UserIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Getting authenticated user by accessing '/me' test")
@@ -34,7 +34,7 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.OK.value());
 
-        assertThat(response.extract().body().jsonPath().getString("username")).isEqualTo(TestUsers.ALICE.username());
+        assertThat(response.extract().as(UserResponse.class).username()).isEqualTo(TestUsers.ALICE.username());
     }
 
     @Test

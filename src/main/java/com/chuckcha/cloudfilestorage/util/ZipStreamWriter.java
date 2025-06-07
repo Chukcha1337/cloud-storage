@@ -1,10 +1,6 @@
 package com.chuckcha.cloudfilestorage.util;
 
 import com.chuckcha.cloudfilestorage.exception.MinioDownloadException;
-import io.minio.GetObjectArgs;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -17,13 +13,13 @@ public class ZipStreamWriter implements AutoCloseable {
         zipOut = new ZipOutputStream(outputStream);
     }
 
-    public void addFile(String entryName, InputStream content) {
+    public void addFile(String entryName, InputStream inputStream) {
         try {
             zipOut.putNextEntry(new ZipEntry(entryName));
-            content.transferTo(zipOut);
+            inputStream.transferTo(zipOut);
             zipOut.closeEntry();
         } catch (Exception e) {
-            throw new MinioDownloadException("Failed to get object: %s".formatted(entryName), e);
+            throw new MinioDownloadException("Failed to add entry to zip: %s".formatted(entryName), e);
         }
     }
 

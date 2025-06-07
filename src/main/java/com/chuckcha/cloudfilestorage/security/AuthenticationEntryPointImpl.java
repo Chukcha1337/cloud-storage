@@ -15,7 +15,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthenticationEntryPointImpl implements org.springframework.security.web.AuthenticationEntryPoint {
 
-    ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {

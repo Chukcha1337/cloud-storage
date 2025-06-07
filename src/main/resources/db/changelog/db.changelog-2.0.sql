@@ -12,5 +12,9 @@ CREATE TABLE IF NOT EXISTS metadata
     modified_at TIMESTAMP
 );
 
+--changeset chuckcha:added index path_name
+CREATE INDEX idx_metadata_path_name ON metadata (path, name);
+
 --changeset chuckcha:added index path_name_type
 CREATE INDEX idx_metadata_path_name_type ON metadata (path, name, type);
+
