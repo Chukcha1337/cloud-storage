@@ -13,8 +13,6 @@ public interface MetadataRepository extends JpaRepository<Metadata, Long> {
 
     Optional<Metadata> findByPathAndNameAndType(String path, String name, Type type);
 
-    List<Metadata> findAllByNameContains(String name);
-
     boolean existsByPathAndNameAndType(String path, String name, Type type);
 
     void deleteByPathAndNameAndType(String path, String name, Type type);

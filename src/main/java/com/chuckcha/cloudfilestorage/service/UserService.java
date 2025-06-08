@@ -1,6 +1,6 @@
 package com.chuckcha.cloudfilestorage.service;
 
-import com.chuckcha.cloudfilestorage.dto.request.UserRegistrationRequest;
+import com.chuckcha.cloudfilestorage.dto.request.user.UserRegistrationRequest;
 import com.chuckcha.cloudfilestorage.dto.response.UserResponse;
 import com.chuckcha.cloudfilestorage.entity.User;
 import com.chuckcha.cloudfilestorage.mapper.UserMapper;
@@ -21,6 +21,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MetadataService metadataService;
     private final UserMapper mapper;
 
     @Transactional
@@ -31,8 +32,6 @@ public class UserService implements UserDetailsService {
 
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.rawPassword()));
-
-        //TODO: реализовать создание директории user-%d-files/
 
         return mapper.toDto(userRepository.save(user));
     }

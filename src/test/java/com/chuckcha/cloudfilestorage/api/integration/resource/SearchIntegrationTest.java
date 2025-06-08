@@ -1,5 +1,6 @@
-package com.chuckcha.cloudfilestorage.integration;
+package com.chuckcha.cloudfilestorage.api.integration.resource;
 
+import com.chuckcha.cloudfilestorage.api.integration.AbstractIntegrationTest;
 import com.chuckcha.cloudfilestorage.dto.response.MetadataResponse;
 import com.chuckcha.cloudfilestorage.entity.Type;
 import io.restassured.response.Response;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class SearchIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Successful searching of valid data test")
     @ParameterizedTest(name = "Searching data with name [{1}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.UploadingScenarios#onlyOneValidUploadingFile")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.UploadingTestScenarios#onlyOneValidUploadingFile")
     public void shouldFindValidData(String path, MultipartFile[] file) throws IOException {
 
         Map<String, String> cookies = authUserWithCookies();

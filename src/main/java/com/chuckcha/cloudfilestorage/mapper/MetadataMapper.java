@@ -1,9 +1,8 @@
 package com.chuckcha.cloudfilestorage.mapper;
 
-import com.chuckcha.cloudfilestorage.dto.request.MetadataRequest;
+import com.chuckcha.cloudfilestorage.dto.request.path.MetadataRequest;
 import com.chuckcha.cloudfilestorage.dto.response.MetadataResponse;
 import com.chuckcha.cloudfilestorage.entity.Metadata;
-import com.chuckcha.cloudfilestorage.util.PathDataHandler;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -11,8 +10,6 @@ import static com.chuckcha.cloudfilestorage.util.PathDataHandler.*;
 
 @Mapper(componentModel = "spring")
 public interface MetadataMapper {
-
-    Metadata toEntity(MetadataResponse metadataResponse);
 
     @Mapping(
             target = "size",

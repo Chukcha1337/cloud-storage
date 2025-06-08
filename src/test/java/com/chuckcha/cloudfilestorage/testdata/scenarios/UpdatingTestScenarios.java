@@ -1,11 +1,13 @@
-package com.chuckcha.cloudfilestorage.util;
+package com.chuckcha.cloudfilestorage.testdata.scenarios;
 
+import com.chuckcha.cloudfilestorage.testdata.data.TestFiles;
+import com.chuckcha.cloudfilestorage.testdata.data.TestPaths;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.stream.Stream;
 
-public class TestUpdatingScenarios {
+public class UpdatingTestScenarios {
 
     public static Stream<Arguments> updatingValidScenarios() {
         return Stream.of(

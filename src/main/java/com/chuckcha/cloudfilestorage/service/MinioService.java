@@ -1,7 +1,6 @@
 package com.chuckcha.cloudfilestorage.service;
 
-import com.chuckcha.cloudfilestorage.dto.request.MetadataRequest;
-import com.chuckcha.cloudfilestorage.entity.Type;
+import com.chuckcha.cloudfilestorage.dto.request.path.MetadataRequest;
 import com.chuckcha.cloudfilestorage.exception.DataNotFoundException;
 import com.chuckcha.cloudfilestorage.exception.MinioDownloadException;
 import com.chuckcha.cloudfilestorage.exception.MinioMoveException;

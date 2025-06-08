@@ -1,10 +1,11 @@
-package com.chuckcha.cloudfilestorage.integration;
+package com.chuckcha.cloudfilestorage.api.integration.auth;
 
-import com.chuckcha.cloudfilestorage.dto.request.UserRegistrationRequest;
+import com.chuckcha.cloudfilestorage.api.integration.AbstractIntegrationTest;
+import com.chuckcha.cloudfilestorage.dto.request.user.UserRegistrationRequest;
 import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
 import com.chuckcha.cloudfilestorage.dto.response.UserResponse;
 import com.chuckcha.cloudfilestorage.entity.User;
-import com.chuckcha.cloudfilestorage.util.TestUsers;
+import com.chuckcha.cloudfilestorage.testdata.data.TestUsers;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +29,7 @@ public class RegistrationIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Successful valid user registration test")
     @ParameterizedTest(name = "Registration of user {0}")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUsers#validUsers")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.data.TestUsers#validUsers")
     public void shouldRegisterNewUserSuccessfully(UserRegistrationRequest user) {
         Response response = given()
                 .contentType(ContentType.JSON)
@@ -46,7 +47,7 @@ public class RegistrationIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Unsuccessful invalid user registration test")
     @ParameterizedTest(name = "Registration of user {0}")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUsers#invalidUsers")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.data.TestUsers#invalidUsers")
     public void shouldNotRegisterNewInvalidUser(UserRegistrationRequest user) {
         Response response = given()
                 .contentType(ContentType.JSON)

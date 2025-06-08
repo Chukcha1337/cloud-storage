@@ -1,7 +1,7 @@
 package com.chuckcha.cloudfilestorage.controller;
 
-import com.chuckcha.cloudfilestorage.dto.request.UserLoginRequest;
-import com.chuckcha.cloudfilestorage.dto.request.UserRegistrationRequest;
+import com.chuckcha.cloudfilestorage.dto.request.user.UserLoginRequest;
+import com.chuckcha.cloudfilestorage.dto.request.user.UserRegistrationRequest;
 import com.chuckcha.cloudfilestorage.dto.response.UserResponse;
 import com.chuckcha.cloudfilestorage.security.service.AuthenticationService;
 import com.chuckcha.cloudfilestorage.service.UserService;
@@ -10,13 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolderStrategy;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

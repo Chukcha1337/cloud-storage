@@ -1,12 +1,10 @@
-package com.chuckcha.cloudfilestorage.api;
+package com.chuckcha.cloudfilestorage.api.integration.global;
 
 import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
-import com.chuckcha.cloudfilestorage.integration.AbstractIntegrationTest;
+import com.chuckcha.cloudfilestorage.api.integration.AbstractIntegrationTest;
 import io.restassured.response.Response;
-import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
@@ -18,7 +16,7 @@ public class GlobalErrorTests extends AbstractIntegrationTest {
 
     @DisplayName("Invalid or empty path with code 400 - Bad Request test")
     @ParameterizedTest(name = "Testing [{1}] endpoint with path [{3}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestErrorScenarios#badRequestScenarios")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.GlobalErrorTestScenarios#badRequestScenarios")
     public void shouldNotGetContentWithInvalidPath(String method, String endpoint, String param, String path) {
 
         RequestSpecification request = given()
@@ -35,7 +33,7 @@ public class GlobalErrorTests extends AbstractIntegrationTest {
 
     @DisplayName("Failed access unauthorized user with code 401 - Unauthorized test")
     @ParameterizedTest(name = "Testing [{1}] endpoint with path [{3}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestErrorScenarios#unauthorizedScenarios")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.GlobalErrorTestScenarios#unauthorizedScenarios")
     public void shouldNotGetContentForUnauthorizedUser(String method, String endpoint, String param, String path) {
 
         RequestSpecification request = given().queryParam(param, path);
@@ -50,7 +48,7 @@ public class GlobalErrorTests extends AbstractIntegrationTest {
 
     @DisplayName("Failed to find content with code 404 - Not Found test")
     @ParameterizedTest(name = "Testing [{1}] endpoint with path [{3}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestErrorScenarios#notFoundScenarios")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.GlobalErrorTestScenarios#notFoundScenarios")
     public void shouldNotGetNonExistingData(String method, String endpoint, String param, String path) {
 
         RequestSpecification request = given()

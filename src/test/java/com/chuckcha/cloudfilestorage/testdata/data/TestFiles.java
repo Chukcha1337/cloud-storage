@@ -1,4 +1,4 @@
-package com.chuckcha.cloudfilestorage.util;
+package com.chuckcha.cloudfilestorage.testdata.data;
 
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,7 +1,6 @@
 package com.chuckcha.cloudfilestorage.util;
 
-import com.chuckcha.cloudfilestorage.dto.request.MetadataRequest;
-import com.chuckcha.cloudfilestorage.dto.response.MetadataResponse;
+import com.chuckcha.cloudfilestorage.dto.request.path.MetadataRequest;
 import com.chuckcha.cloudfilestorage.entity.Type;
 import com.chuckcha.cloudfilestorage.exception.DataNotFoundException;
 import com.chuckcha.cloudfilestorage.service.MetadataService;
@@ -10,9 +9,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Optional;
 
 import static com.chuckcha.cloudfilestorage.util.PathDataHandler.*;
 

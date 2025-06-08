@@ -1,8 +1,7 @@
-package com.chuckcha.cloudfilestorage.util;
+package com.chuckcha.cloudfilestorage.testdata.data;
 
-import com.chuckcha.cloudfilestorage.dto.request.AnyPathDto;
-import com.chuckcha.cloudfilestorage.dto.request.DirectoryPathDto;
-import com.chuckcha.cloudfilestorage.dto.request.PathRequest;
+import com.chuckcha.cloudfilestorage.dto.request.path.AnyPathDto;
+import com.chuckcha.cloudfilestorage.dto.request.path.DirectoryPathDto;
 import com.chuckcha.cloudfilestorage.dto.request.SearchRequest;
 
 import java.util.stream.Stream;

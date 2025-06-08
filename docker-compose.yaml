@@ -11,9 +11,9 @@ services:
     container_name: filestorage-postgres
     restart: always
     environment:
-      POSTGRES_DB: cloud-filestorage
-      POSTGRES_USER: chuckcha
-      POSTGRES_PASSWORD: chuckcha
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
@@ -26,13 +26,43 @@ services:
       - "9000:9000"  # API
       - "9001:9001"  # Web UI
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
     command: server --console-address ":9001" /data
     restart: always
 
+  cloud-filestorage:
+    build: .
+    container_name: cloud-filestorage-container
+    restart: always
+    depends_on:
+      - db
+      - redis
+      - minio
+    environment:
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DRIVER: ${DB_DRIVER}
+      DB_DATABASE: ${DB_DATABASE}
+
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      MINIO_ROOT_USER_DIRECTORY: ${MINIO_ROOT_USER_DIRECTORY}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+
+    ports:
+      - "8085:8085"
+      - "5005:5005"
+    volumes:
+      - ./logs:/app/logs
 
 volumes:
   db_data:

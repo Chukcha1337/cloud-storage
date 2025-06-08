@@ -4,4 +4,6 @@ ext {
     set('springCloudVersion', "2024.0.1")
     set('mapstructVersion', "1.5.5.Final")
     set('minioVersion', "8.5.17")
+    set('springdocVersion', "2.8.8")
+    set('minioTestVersion', "1.21.1")
 }

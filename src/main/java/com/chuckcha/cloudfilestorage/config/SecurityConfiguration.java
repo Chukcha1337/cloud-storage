@@ -64,7 +64,6 @@ public class SecurityConfiguration {
 
     @Bean
     public UnauthorizedLogoutFilter unauthorizedLogoutFilter(
-            SecurityContextHolderStrategy securityContextHolderStrategy,
             JsonResponseHandler jsonResponseHandler,
             SecurityContextService securityContextService) {
         return new UnauthorizedLogoutFilter(LOGOUT_PATH, jsonResponseHandler, securityContextService);

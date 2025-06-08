@@ -1,11 +1,10 @@
 package com.chuckcha.cloudfilestorage.controller;
 
-import com.chuckcha.cloudfilestorage.dto.request.AnyPathDto;
-import com.chuckcha.cloudfilestorage.dto.request.DirectoryPathDto;
+import com.chuckcha.cloudfilestorage.dto.request.path.AnyPathDto;
+import com.chuckcha.cloudfilestorage.dto.request.path.DirectoryPathDto;
 import com.chuckcha.cloudfilestorage.dto.request.SearchRequest;
 import com.chuckcha.cloudfilestorage.dto.response.MetadataResponse;
 import com.chuckcha.cloudfilestorage.security.model.UserDetailsImpl;
-import com.chuckcha.cloudfilestorage.service.MetadataService;
 import com.chuckcha.cloudfilestorage.service.ResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -30,7 +29,6 @@ import static com.chuckcha.cloudfilestorage.util.PathDataHandler.extractName;
 public class ResourceController {
 
     private final ResourceService resourceService;
-    private final MetadataService metadataService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -59,7 +57,7 @@ public class ResourceController {
 
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    public List<MetadataResponse> update(
+    public List<MetadataResponse> search(
             @Validated @ModelAttribute("query") SearchRequest query,
             @AuthenticationPrincipal UserDetailsImpl user
     ) {

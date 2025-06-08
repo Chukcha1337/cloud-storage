@@ -1,4 +1,4 @@
-package com.chuckcha.cloudfilestorage.dto.request;
+package com.chuckcha.cloudfilestorage.dto.request.path;
 
 import com.chuckcha.cloudfilestorage.entity.Type;
 

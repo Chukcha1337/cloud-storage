@@ -1,32 +1,22 @@
-package com.chuckcha.cloudfilestorage.integration;
+package com.chuckcha.cloudfilestorage.api.integration.resource;
 
-import com.chuckcha.cloudfilestorage.dto.request.DirectoryPathDto;
-import com.chuckcha.cloudfilestorage.dto.request.MetadataRequest;
-import com.chuckcha.cloudfilestorage.dto.request.UserRegistrationRequest;
+import com.chuckcha.cloudfilestorage.api.integration.AbstractIntegrationTest;
+import com.chuckcha.cloudfilestorage.dto.request.path.DirectoryPathDto;
+import com.chuckcha.cloudfilestorage.dto.request.path.MetadataRequest;
 import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
 import com.chuckcha.cloudfilestorage.dto.response.MetadataResponse;
 import com.chuckcha.cloudfilestorage.entity.Metadata;
 import com.chuckcha.cloudfilestorage.entity.Type;
-import com.chuckcha.cloudfilestorage.entity.User;
-import com.chuckcha.cloudfilestorage.mapper.MetadataMapper;
-import com.chuckcha.cloudfilestorage.service.MetadataService;
-import com.chuckcha.cloudfilestorage.util.TestFiles;
-import com.chuckcha.cloudfilestorage.util.TestPaths;
-import com.chuckcha.cloudfilestorage.util.TestUsers;
-import io.restassured.http.ContentType;
+import com.chuckcha.cloudfilestorage.testdata.data.TestFiles;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
@@ -36,7 +26,7 @@ public class DirectoryIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Successful creating new empty folder test")
     @ParameterizedTest(name = "Creating folder with name {0}")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestPaths#validDirectoryPaths")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.data.TestPaths#validDirectoryPaths")
     public void shouldCreateNewEmptyFolderSuccessfully(DirectoryPathDto path) {
 
         Map<String, String> cookies = authUserWithCookies();

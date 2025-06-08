@@ -1,6 +1,7 @@
-package com.chuckcha.cloudfilestorage.integration;
+package com.chuckcha.cloudfilestorage.api.integration.auth;
 
-import com.chuckcha.cloudfilestorage.util.TestUsers;
+import com.chuckcha.cloudfilestorage.api.integration.AbstractIntegrationTest;
+import com.chuckcha.cloudfilestorage.testdata.data.TestUsers;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;

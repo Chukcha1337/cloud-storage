@@ -1,10 +1,10 @@
-package com.chuckcha.cloudfilestorage.dto.request;
+package com.chuckcha.cloudfilestorage.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record UserRegistrationRequest(
+public record UserLoginRequest(
 
         @NotBlank(message = "Cannot be empty")
         @Size(min = 5, max = 20, message = "Must be {min}-{max} chars")
@@ -15,10 +15,10 @@ public record UserRegistrationRequest(
         String username,
 
         @NotBlank(message = "Cannot be empty")
-        @Size(min = 5, max = 20, message = "Must be {min}-{max} chars")
+        @Size(min = 5, max = 20, message = "Must be  {min}-{max} chars")
         @Pattern(
                 regexp = "^[a-zA-Z0-9!@#$%^&*(),.?\":{}|<>\\[\\]/`~+=\\-_';]*$",
                 message = "Invalid characters"
         )
-        String rawPassword) {
+        String password) {
 }

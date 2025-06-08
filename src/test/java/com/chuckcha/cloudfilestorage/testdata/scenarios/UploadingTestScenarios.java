@@ -1,13 +1,13 @@
-package com.chuckcha.cloudfilestorage.util;
+package com.chuckcha.cloudfilestorage.testdata.scenarios;
 
-import com.chuckcha.cloudfilestorage.dto.request.AnyPathDto;
+import com.chuckcha.cloudfilestorage.testdata.data.TestFiles;
+import com.chuckcha.cloudfilestorage.testdata.data.TestPaths;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class UploadingScenarios {
+public class UploadingTestScenarios {
 
     public static Stream<Arguments> validUploadingScenarios() {
         return Stream.of(

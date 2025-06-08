@@ -1,12 +1,11 @@
-package com.chuckcha.cloudfilestorage.integration;
+package com.chuckcha.cloudfilestorage.api.integration.resource;
 
-import com.chuckcha.cloudfilestorage.dto.request.AnyPathDto;
-import com.chuckcha.cloudfilestorage.dto.request.MetadataRequest;
+import com.chuckcha.cloudfilestorage.api.integration.AbstractIntegrationTest;
+import com.chuckcha.cloudfilestorage.dto.request.path.AnyPathDto;
+import com.chuckcha.cloudfilestorage.dto.request.path.MetadataRequest;
 import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
 import com.chuckcha.cloudfilestorage.dto.response.MetadataResponse;
-import com.chuckcha.cloudfilestorage.entity.Type;
-import com.chuckcha.cloudfilestorage.util.PathDataHandler;
-import com.chuckcha.cloudfilestorage.util.TestFiles;
+import com.chuckcha.cloudfilestorage.testdata.data.TestFiles;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +28,7 @@ public class ResourceIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Successful getting info about valid resource test")
     @ParameterizedTest(name = "Getting info about resource with path {0}")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestPaths#validFileAndDirectoryPaths")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.data.TestPaths#validFileAndDirectoryPaths")
     public void shouldGetInfoAboutResource(AnyPathDto anyPathDto) {
 
         Map<String, String> cookies = authUserWithCookies();
@@ -62,7 +61,7 @@ public class ResourceIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Successful deleting resource test")
     @ParameterizedTest(name = "Deleting file to path [{0}] with name [{1}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.UploadingScenarios#onlyOneValidUploadingFile")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.UploadingTestScenarios#onlyOneValidUploadingFile")
     public void shouldDeleteValidData(String path, MultipartFile[] file) throws IOException {
 
         Map<String, String> cookies = authUserWithCookies();
@@ -91,7 +90,7 @@ public class ResourceIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Successful downloading of file")
     @ParameterizedTest(name = "Downloading file with path [{0}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.UploadingScenarios#onlyOneValidUploadingFile")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.UploadingTestScenarios#onlyOneValidUploadingFile")
     public void shouldSuccessfulDownloadFile(String path, MultipartFile[] file) throws IOException {
 
         Map<String, String> cookies = authUserWithCookies();
@@ -122,7 +121,7 @@ public class ResourceIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Successful resource updating test")
     @ParameterizedTest(name = "Updating resource from path [{0}] to [{1}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUpdatingScenarios#updatingValidScenarios")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.UpdatingTestScenarios#updatingValidScenarios")
     public void shouldSuccessfulUpdateResource(String from, String to, MultipartFile[] file) throws IOException {
 
         Map<String, String> cookies = authUserWithCookies();
@@ -172,7 +171,7 @@ public class ResourceIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Invalid or empty path with code 400 - Bad Request test")
     @ParameterizedTest(name = "Trying to update resource from path [{0}] to [{1}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUpdatingScenarios#updatingInvalidPathsScenarios")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.UpdatingTestScenarios#updatingInvalidPathsScenarios")
     public void shouldFailToUpdateResourceWithInvalidPath(String from, String to, MultipartFile[] file) {
 
         Map<String, String> cookies = authUserWithCookies();
@@ -193,7 +192,7 @@ public class ResourceIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Failed access unauthorized user with code 401 - Unauthorized test")
     @ParameterizedTest(name = "Trying to update resource from path [{0}] to [{1}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUpdatingScenarios#oneUpdatingValidScenario")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.UpdatingTestScenarios#oneUpdatingValidScenario")
     public void shouldFailToUpdateResourceWithUnauthorizedUser(String from, String to, MultipartFile[] file) {
 
         Response response = given()
@@ -211,7 +210,7 @@ public class ResourceIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Failed to find content with code 404 - Not Found test")
     @ParameterizedTest(name = "Updating resource from path [{0}] to [{1}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUpdatingScenarios#oneUpdatingValidScenario")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.UpdatingTestScenarios#oneUpdatingValidScenario")
     public void shouldNotUpdateNotFoundResource(String from, String to, MultipartFile[] file) throws IOException {
 
         Map<String, String> cookies = authUserWithCookies();
@@ -232,7 +231,7 @@ public class ResourceIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Failed to update resource to existing path with code 404 - Conflict test")
     @ParameterizedTest(name = "Updating resource from path [{0}] to [{1}]")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUpdatingScenarios#oneUpdatingValidScenario")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.scenarios.UpdatingTestScenarios#oneUpdatingValidScenario")
     public void shouldNotUpdateResourceAlreadyExisted(String from, String to, MultipartFile[] file) throws IOException {
 
         Map<String, String> cookies = authUserWithCookies();

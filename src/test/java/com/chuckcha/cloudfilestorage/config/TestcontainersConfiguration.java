@@ -22,4 +22,13 @@ public class TestcontainersConfiguration {
         return new GenericContainer<>(DockerImageName.parse("redis:7")).withExposedPorts(6379);
     }
 
+    public static final GenericContainer<?> minioContainer = new GenericContainer<>(DockerImageName.parse("minio/minio:latest"))
+            .withExposedPorts(9000)
+            .withEnv("MINIO_ACCESS_KEY", "minioaccesskey")
+            .withEnv("MINIO_SECRET_KEY", "miniosecretkey")
+            .withCommand("server /data");
+
+    static {
+        minioContainer.start();
+    }
 }

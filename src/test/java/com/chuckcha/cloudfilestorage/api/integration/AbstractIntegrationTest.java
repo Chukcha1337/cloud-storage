@@ -1,14 +1,14 @@
-package com.chuckcha.cloudfilestorage.integration;
+package com.chuckcha.cloudfilestorage.api.integration;
 
 import com.chuckcha.cloudfilestorage.config.TestcontainersConfiguration;
-import com.chuckcha.cloudfilestorage.dto.request.UserRegistrationRequest;
+import com.chuckcha.cloudfilestorage.dto.request.user.UserRegistrationRequest;
 import com.chuckcha.cloudfilestorage.dto.response.MetadataResponse;
 import com.chuckcha.cloudfilestorage.mapper.MetadataMapper;
 import com.chuckcha.cloudfilestorage.repository.MetadataRepository;
 import com.chuckcha.cloudfilestorage.repository.UserRepository;
 import com.chuckcha.cloudfilestorage.service.MetadataService;
-import com.chuckcha.cloudfilestorage.util.TestPaths;
-import com.chuckcha.cloudfilestorage.util.TestUsers;
+import com.chuckcha.cloudfilestorage.testdata.data.TestPaths;
+import com.chuckcha.cloudfilestorage.testdata.data.TestUsers;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -21,6 +21,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -33,6 +35,17 @@ import static io.restassured.RestAssured.given;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public abstract class AbstractIntegrationTest {
+
+    @DynamicPropertySource
+    static void dynamicProperties(DynamicPropertyRegistry registry) {
+        // minio url
+        String minioUrl = "http://" + TestcontainersConfiguration.minioContainer.getHost()
+                          + ":" + TestcontainersConfiguration.minioContainer.getFirstMappedPort();
+
+        registry.add("minio.url", () -> minioUrl);
+        registry.add("minio.access-key", () -> "minioaccesskey");
+        registry.add("minio.secret-key", () -> "miniosecretkey");
+    }
 
     @LocalServerPort
     protected int port;

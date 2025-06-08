@@ -1,15 +1,21 @@
-package com.chuckcha.cloudfilestorage.util;
+package com.chuckcha.cloudfilestorage.testdata.data;
 
-import com.chuckcha.cloudfilestorage.dto.request.UserRegistrationRequest;
-import com.chuckcha.cloudfilestorage.dto.request.UserLoginRequest;
+import com.chuckcha.cloudfilestorage.dto.request.user.UserRegistrationRequest;
+import com.chuckcha.cloudfilestorage.dto.request.user.UserLoginRequest;
 
 import java.util.stream.Stream;
 
 public class TestUsers {
 
-    public static final UserRegistrationRequest ALICE = new UserRegistrationRequest("alice", "StrongPass1!");
-    public static final UserRegistrationRequest FYODOR = new UserRegistrationRequest("fyodor", "Secret123!");
-    public static final UserRegistrationRequest CHARLIE = new UserRegistrationRequest("charlie", "Password456");
+    // Valid users
+    public static final UserRegistrationRequest ALICE =
+            new UserRegistrationRequest("alice", "StrongPass1!");
+    public static final UserRegistrationRequest FYODOR =
+            new UserRegistrationRequest("fyodor", "Secret123!");
+    public static final UserRegistrationRequest CHARLIE =
+            new UserRegistrationRequest("charlie", "Password456");
+
+    // Invalid users
     public static final UserRegistrationRequest EMPTY_USERNAME =
             new UserRegistrationRequest("", "ValidPass1!");
     public static final UserRegistrationRequest SHORT_USERNAME =
@@ -23,6 +29,7 @@ public class TestUsers {
     public static final UserRegistrationRequest INVALID_PASSWORD_PATTERN =
             new UserRegistrationRequest("validname", "bad password<>");
 
+    // User's streams
     public static Stream<UserRegistrationRequest> validUsers() {
         return Stream.of(ALICE, FYODOR, CHARLIE);
     }

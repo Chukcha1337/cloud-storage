@@ -1,7 +1,8 @@
-package com.chuckcha.cloudfilestorage.integration;
+package com.chuckcha.cloudfilestorage.api.integration.auth;
 
-import com.chuckcha.cloudfilestorage.dto.request.UserRegistrationRequest;
-import com.chuckcha.cloudfilestorage.dto.request.UserLoginRequest;
+import com.chuckcha.cloudfilestorage.api.integration.AbstractIntegrationTest;
+import com.chuckcha.cloudfilestorage.dto.request.user.UserRegistrationRequest;
+import com.chuckcha.cloudfilestorage.dto.request.user.UserLoginRequest;
 import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
 import com.chuckcha.cloudfilestorage.dto.response.UserResponse;
 import io.restassured.http.ContentType;
@@ -21,7 +22,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Valid user authentication test")
     @ParameterizedTest(name = "Authentication of user {0}")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUsers#validLoginUsers")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.data.TestUsers#validLoginUsers")
     public void shouldAuthenticateValidUser(UserLoginRequest loginUser) {
 
         UserRegistrationRequest testUser = new UserRegistrationRequest(loginUser.username(), loginUser.password());
@@ -50,7 +51,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("Invalid user authentication test")
     @ParameterizedTest(name = "Authentication of user {0}")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUsers#invalidLoginUsers")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.data.TestUsers#invalidLoginUsers")
     public void shouldNotAuthenticateInvalidUser(UserLoginRequest loginUser) {
 
         Response userLoginResponse = given()
@@ -66,7 +67,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
     @DisplayName("No such valid user at database test")
     @ParameterizedTest(name = "Authentication of user {0}")
-    @MethodSource("com.chuckcha.cloudfilestorage.util.TestUsers#validLoginUsers")
+    @MethodSource("com.chuckcha.cloudfilestorage.testdata.data.TestUsers#validLoginUsers")
     public void shouldNotAuthenticateUnregisteredUser(UserLoginRequest loginUser) {
 
         Response userLoginResponse = given()

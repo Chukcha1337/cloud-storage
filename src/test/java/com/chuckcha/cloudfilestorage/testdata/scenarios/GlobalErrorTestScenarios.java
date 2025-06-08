@@ -1,15 +1,13 @@
-package com.chuckcha.cloudfilestorage.util;
+package com.chuckcha.cloudfilestorage.testdata.scenarios;
 
-import com.chuckcha.cloudfilestorage.dto.request.AnyPathDto;
-import com.chuckcha.cloudfilestorage.dto.request.DirectoryPathDto;
-import com.chuckcha.cloudfilestorage.dto.request.PathRequest;
-import com.chuckcha.cloudfilestorage.dto.request.SearchRequest;
+import com.chuckcha.cloudfilestorage.dto.request.path.PathRequest;
+import com.chuckcha.cloudfilestorage.testdata.data.TestPaths;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class TestErrorScenarios {
+public class GlobalErrorTestScenarios {
 
     public static Stream<Arguments> badRequestScenarios() {
         return Stream.of(

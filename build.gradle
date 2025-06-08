@@ -38,11 +38,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     implementation 'org.liquibase:liquibase-core'
-    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-    runtimeOnly 'org.postgresql:postgresql'
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+    implementation "io.minio:minio:${minioVersion}"
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-    implementation "io.minio:minio:${minioVersion}"
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    runtimeOnly 'org.postgresql:postgresql'
 
     annotationProcessor 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok'
@@ -53,6 +54,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:postgresql'
+    testImplementation "org.testcontainers:minio:${minioTestVersion}"
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation "org.assertj:assertj-core:${assertjVersion}"
     testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"

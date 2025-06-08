@@ -1,5 +1,6 @@
 package com.chuckcha.cloudfilestorage.dto.request;
 
+import com.chuckcha.cloudfilestorage.dto.request.path.PathRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
