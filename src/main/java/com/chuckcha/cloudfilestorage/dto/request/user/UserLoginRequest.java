@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public record UserLoginRequest(
 
-        @NotBlank(message = "Cannot be empty")
+        @NotBlank(message = "Cannot be empty1")
         @Size(min = 5, max = 20, message = "Must be {min}-{max} chars")
         @Pattern(
                 regexp = "^[a-zA-Z0-9]+\\w*[a-zA-Z0-9]+$",
@@ -14,7 +14,7 @@ public record UserLoginRequest(
         )
         String username,
 
-        @NotBlank(message = "Cannot be empty")
+        @NotBlank(message = "Cannot be empty2")
         @Size(min = 5, max = 20, message = "Must be  {min}-{max} chars")
         @Pattern(
                 regexp = "^[a-zA-Z0-9!@#$%^&*(),.?\":{}|<>\\[\\]/`~+=\\-_';]*$",

@@ -16,7 +16,6 @@ public class Metadata extends AuditingEntity<Long>{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     String path;
 
     @Column(nullable = false)

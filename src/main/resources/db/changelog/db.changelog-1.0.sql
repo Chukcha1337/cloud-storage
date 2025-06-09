@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset chuckcha:added users table
+--changeset chuckcha:added-users-table
 CREATE TABLE IF NOT EXISTS users
 (
     id BIGSERIAL PRIMARY KEY,

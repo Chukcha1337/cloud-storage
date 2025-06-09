@@ -23,6 +23,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final MetadataService metadataService;
     private final UserMapper mapper;
+    private final ResourceService resourceService;
 
     @Transactional
     public UserResponse create(UserRegistrationRequest dto) {
@@ -31,9 +32,10 @@ public class UserService implements UserDetailsService {
         });
 
         User user = mapper.toEntity(dto);
-        user.setPassword(passwordEncoder.encode(dto.rawPassword()));
-
-        return mapper.toDto(userRepository.save(user));
+        user.setPassword(passwordEncoder.encode(dto.password()));
+        User savedUser = userRepository.save(user);
+        resourceService.createFolders(user.getId(), "");
+        return mapper.toDto(savedUser);
     }
 
     @Override

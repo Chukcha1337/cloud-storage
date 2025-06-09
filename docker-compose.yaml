@@ -6,6 +6,17 @@ services:
       - "6379:6379"
     restart: always
 
+  frontend:
+    build:
+      context: ./cloud-storage-frontend
+      dockerfile: Dockerfile
+    container_name: cloud-filestorage-frontend
+    ports:
+      - "8086:80"
+    depends_on:
+      - cloud-filestorage
+    restart: always
+
   db:
     image: postgres:17
     container_name: filestorage-postgres

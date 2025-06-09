@@ -29,7 +29,7 @@ public class AuthController {
             HttpServletResponse response
     ) {
         UserResponse userResponse = userService.create(userRequest);
-        authenticationService.authenticateAndLogin(userRequest.username(), userRequest.rawPassword(), request, response);
+        authenticationService.authenticateAndLogin(userRequest.username(), userRequest.password(), request, response);
         return userResponse;
     }
 

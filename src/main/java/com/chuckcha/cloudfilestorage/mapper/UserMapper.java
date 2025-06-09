@@ -9,7 +9,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(source = "rawPassword", target = "password")
     @Mapping(target = "role", constant = "USER")
     @Mapping(target = "id", ignore = true)
     User toEntity(UserRegistrationRequest dto);

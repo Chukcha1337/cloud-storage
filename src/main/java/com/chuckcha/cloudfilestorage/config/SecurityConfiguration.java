@@ -29,6 +29,11 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -63,6 +68,19 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:8086"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    @Bean
     public UnauthorizedLogoutFilter unauthorizedLogoutFilter(
             JsonResponseHandler jsonResponseHandler,
             SecurityContextService securityContextService) {
@@ -75,6 +93,9 @@ public class SecurityConfiguration {
                                                    SecurityContextRepository securityContextRepository,
                                                    AuthenticationEntryPointImpl authenticationEntryPoint) throws Exception {
         return http
+                .cors(cors -> cors
+                        .configurationSource(corsConfigurationSource())
+                )
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -86,7 +107,8 @@ public class SecurityConfiguration {
                         .authenticationEntryPoint(authenticationEntryPoint)
                 )
                 .authorizeHttpRequests(urlConfig -> urlConfig
-                        .requestMatchers(REGISTER_PATH, LOGIN_PATH, DOCS_PATH, SWAGGER_PATH).permitAll()
+                        .requestMatchers(REGISTER_PATH, LOGIN_PATH).permitAll()
+                        .requestMatchers( DOCS_PATH, SWAGGER_PATH).hasAuthority("ADMIN")
                         .requestMatchers(LOGOUT_PATH).authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(unauthorizedLogoutFilter, LogoutFilter.class)

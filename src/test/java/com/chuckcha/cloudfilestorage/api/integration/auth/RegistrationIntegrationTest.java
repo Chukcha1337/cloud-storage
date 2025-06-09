@@ -97,7 +97,7 @@ public class RegistrationIntegrationTest extends AbstractIntegrationTest {
                 .then().statusCode(HttpStatus.CREATED.value());
 
         User userResponse = userRepository.findByUsername(testUser.username()).orElseThrow();
-        assertThat(userResponse.getPassword()).isNotEqualTo(testUser.rawPassword());
-        assertThat(passwordEncoder.matches(testUser.rawPassword(), userResponse.getPassword())).isTrue();
+        assertThat(userResponse.getPassword()).isNotEqualTo(testUser.password());
+        assertThat(passwordEncoder.matches(testUser.password(), userResponse.getPassword())).isTrue();
     }
 }

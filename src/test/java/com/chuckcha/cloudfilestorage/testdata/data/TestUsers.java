@@ -47,16 +47,16 @@ public class TestUsers {
 
     public static Stream<UserLoginRequest> validLoginUsers() {
         return validUsers()
-                .map(r -> new UserLoginRequest(r.username(), r.rawPassword()));
+                .map(r -> new UserLoginRequest(r.username(), r.password()));
     }
 
     public static Stream<UserLoginRequest> invalidLoginUsers() {
         return invalidUsers()
-                .map(r -> new UserLoginRequest(r.username(), r.rawPassword()));
+                .map(r -> new UserLoginRequest(r.username(), r.password()));
     }
 
     public static UserLoginRequest toLoginUser(UserRegistrationRequest userRegistrationRequest) {
-        return new UserLoginRequest(userRegistrationRequest.username(), userRegistrationRequest.rawPassword());
+        return new UserLoginRequest(userRegistrationRequest.username(), userRegistrationRequest.password());
     }
 
 }
