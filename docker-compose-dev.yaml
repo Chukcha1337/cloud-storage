@@ -1,4 +1,5 @@
 services:
+
   redis:
     image: redis:7
     container_name: filestorage-redis
@@ -12,9 +13,7 @@ services:
       dockerfile: Dockerfile
     container_name: cloud-filestorage-frontend
     ports:
-      - "80:80"
-    depends_on:
-      - cloud-filestorage
+      - "8086:80"
     restart: always
 
   db:
@@ -43,22 +42,6 @@ services:
       - minio_data:/data
     command: server --console-address ":9001" /data
     restart: always
-
-  cloud-filestorage:
-    build: .
-    container_name: cloud-filestorage-container
-    restart: always
-    depends_on:
-      - db
-      - redis
-      - minio
-    env_file:
-      - .env
-
-    ports:
-      - "8085:8085"
-    volumes:
-      - ./logs:/app/logs
 
 volumes:
   db_data:

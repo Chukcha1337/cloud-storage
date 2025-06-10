@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SecurityContextService {
@@ -22,22 +24,17 @@ public class SecurityContextService {
                                            HttpServletRequest request,
                                            HttpServletResponse response) {
 
-        System.out.println("🟢 APPLYING CONTEXT");
-        System.out.println("🟢 Committed BEFORE session: " + response.isCommitted());
-
-        // Создаём сессию вручную
+        log.info("Apply authentication context");
+        log.info("Committed BEFORE session: {}", response.isCommitted());
         HttpSession session = request.getSession(true);
-        System.out.println("🟢 Session ID: " + session.getId());
+        log.info("Session ID: {}", session.getId());
 
         SecurityContext context = securityContextHolderStrategy.createEmptyContext();
         context.setAuthentication(authentication);
         securityContextHolderStrategy.setContext(context);
-        System.out.println("🟢 Saving SecurityContext: " + context);
 
-        // Сохраняем контекст
+        log.info("Saving SecurityContext: {}", context);
         securityContextRepository.saveContext(context, request, response);
-
-        System.out.println("🟢 Committed AFTER saveContext: " + response.isCommitted());
     }
 
     public boolean isAuthenticated() {

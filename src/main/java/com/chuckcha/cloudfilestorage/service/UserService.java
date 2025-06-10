@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.chuckcha.cloudfilestorage.util.PathDataHandler.getUserDirectoryFolderName;
+
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
@@ -23,7 +25,6 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final MetadataService metadataService;
     private final UserMapper mapper;
-    private final ResourceService resourceService;
 
     @Transactional
     public UserResponse create(UserRegistrationRequest dto) {
@@ -34,7 +35,7 @@ public class UserService implements UserDetailsService {
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.password()));
         User savedUser = userRepository.save(user);
-        resourceService.createFolders(user.getId(), "");
+        metadataService.createFolderIfNotExists("", getUserDirectoryFolderName(user.getId()));
         return mapper.toDto(savedUser);
     }
 

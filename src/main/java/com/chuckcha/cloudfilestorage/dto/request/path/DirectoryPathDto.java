@@ -1,6 +1,5 @@
 package com.chuckcha.cloudfilestorage.dto.request.path;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 public record DirectoryPathDto(
@@ -11,5 +10,4 @@ public record DirectoryPathDto(
     public String path() {
         return path == null ? "" : path;
     }
-
 }

@@ -7,6 +7,7 @@ import com.chuckcha.cloudfilestorage.mapper.MetadataMapper;
 import com.chuckcha.cloudfilestorage.repository.MetadataRepository;
 import com.chuckcha.cloudfilestorage.repository.UserRepository;
 import com.chuckcha.cloudfilestorage.service.MetadataService;
+import com.chuckcha.cloudfilestorage.service.ResourceService;
 import com.chuckcha.cloudfilestorage.testdata.data.TestPaths;
 import com.chuckcha.cloudfilestorage.testdata.data.TestUsers;
 import io.restassured.RestAssured;
@@ -58,6 +59,9 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected MetadataService metadataService;
+
+    @Autowired
+    protected ResourceService resourceService;
 
     @Autowired
     protected MetadataMapper metadataMapper;

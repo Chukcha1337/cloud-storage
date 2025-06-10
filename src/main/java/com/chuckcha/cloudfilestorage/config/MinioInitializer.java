@@ -3,7 +3,6 @@ package com.chuckcha.cloudfilestorage.config;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
-import io.minio.UploadObjectArgs;
 import io.minio.errors.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

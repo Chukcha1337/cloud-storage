@@ -1,6 +1,5 @@
 package com.chuckcha.cloudfilestorage.controller;
 
-
 import com.chuckcha.cloudfilestorage.dto.request.path.DirectoryPathDto;
 import com.chuckcha.cloudfilestorage.dto.response.MetadataResponse;
 import com.chuckcha.cloudfilestorage.security.model.UserDetailsImpl;

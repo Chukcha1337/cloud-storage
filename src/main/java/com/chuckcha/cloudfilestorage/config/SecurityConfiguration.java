@@ -1,13 +1,11 @@
 package com.chuckcha.cloudfilestorage.config;
 
-import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
 import com.chuckcha.cloudfilestorage.security.AuthenticationEntryPointImpl;
 import com.chuckcha.cloudfilestorage.security.filter.UnauthorizedLogoutFilter;
 import com.chuckcha.cloudfilestorage.security.service.SecurityContextService;
 import com.chuckcha.cloudfilestorage.util.JsonResponseHandler;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -26,8 +24,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -46,6 +42,9 @@ public class SecurityConfiguration {
     private static final String REGISTER_PATH = "/api/auth/sign-up";
     private static final String DOCS_PATH = "/v3/api-docs/**";
     private static final String SWAGGER_PATH = "/swagger-ui/**";
+
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -70,7 +69,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:8086"));
+        config.setAllowedOrigins(List.of(allowedOrigins));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -108,7 +107,7 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests(urlConfig -> urlConfig
                         .requestMatchers(REGISTER_PATH, LOGIN_PATH).permitAll()
-                        .requestMatchers( DOCS_PATH, SWAGGER_PATH).hasAuthority("ADMIN")
+                        .requestMatchers(DOCS_PATH, SWAGGER_PATH).hasAuthority("ADMIN")
                         .requestMatchers(LOGOUT_PATH).authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(unauthorizedLogoutFilter, LogoutFilter.class)

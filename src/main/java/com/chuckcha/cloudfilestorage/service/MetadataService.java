@@ -80,8 +80,8 @@ public class MetadataService {
     public MetadataResponse updateFile(MetadataRequest requestFrom, MetadataRequest requestTo) {
         return metadataRepository.findByPathAndNameAndType(requestFrom.path(), requestFrom.name(), requestFrom.type())
                 .map(from -> {
-                        from.setName(requestTo.name());
-                        from.setPath(requestTo.path());
+                    from.setName(requestTo.name());
+                    from.setPath(requestTo.path());
                     return metadataRepository.save(from);
                 })
                 .map(metadataMapper::toResponse)
@@ -122,10 +122,9 @@ public class MetadataService {
     }
 
     public List<MetadataResponse> getFolderContent(MetadataRequest request) {
-        List<MetadataResponse> result = metadataRepository.findAllByPath(request.fullPath()).stream().map(metadataMapper::toResponse).toList();
-        if (result.isEmpty()) {
-            throw new DataNotFoundException("Failed find content at %s".formatted(request.fullPath()));
+        if (!exists(request)) {
+            throw new DataNotFoundException("Failed find folder with path %s".formatted(request.fullPath()));
         }
-        return result;
+        return metadataRepository.findAllByPath(request.fullPath()).stream().map(metadataMapper::toResponse).toList();
     }
 }

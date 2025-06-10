@@ -2,10 +2,8 @@ package com.chuckcha.cloudfilestorage.util;
 
 import com.chuckcha.cloudfilestorage.entity.Type;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class PathDataHandler {
@@ -45,11 +43,16 @@ public final class PathDataHandler {
         return folders;
     }
 
-    public static String getFullPath(Long userId, String path) {
-        return rootUserDirectoryPattern.formatted(userId).concat(path);
-    }
-
     public static String getUserDirectoryPath(Long userId) {
         return rootUserDirectoryPattern.formatted(userId);
+    }
+
+    public static String getFullPath(Long userId, String path) {
+        return path.startsWith(rootUserDirectoryPattern.formatted(userId)) ? path : getUserDirectoryPath(userId).concat(path);
+    }
+
+    public static String getUserDirectoryFolderName(Long userId) {
+        return getUserDirectoryPath(userId).replaceFirst("/", "");
+
     }
 }

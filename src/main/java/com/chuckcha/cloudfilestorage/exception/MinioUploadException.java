@@ -1,7 +1,5 @@
 package com.chuckcha.cloudfilestorage.exception;
 
-import io.minio.errors.MinioException;
-
 import java.io.Serial;
 
 public class MinioUploadException extends RuntimeException {

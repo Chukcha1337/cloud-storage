@@ -30,6 +30,9 @@ public class FileValidator {
             if (originalName == null || originalName.isBlank()) {
                 throw new IllegalArgumentException("File name cannot be null or empty");
             }
+            if (!originalName.matches("^([a-zA-Z0-9._-]+/)*[a-zA-Z0-9._-]+/?$")) {
+                throw new IllegalArgumentException("File name does not match the required pattern");
+            }
             if (metadataService.exists(extractActualPath(fullFileName), extractName(fullFileName), Type.FILE)) {
                 throw new DuplicateKeyException("There are duplicates at your files");
             }

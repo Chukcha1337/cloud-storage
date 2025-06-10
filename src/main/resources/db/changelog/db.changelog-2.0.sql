@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset chuckcha:added-table-metadata
+--changeset chuckcha:metadata-table-added
 CREATE TABLE IF NOT EXISTS metadata
 (
     id BIGSERIAL PRIMARY KEY,
@@ -12,9 +12,15 @@ CREATE TABLE IF NOT EXISTS metadata
     modified_at TIMESTAMP
 );
 
---changeset chuckcha:added-index-path_name
+--changeset chuckcha:first_index-path_name-added
 CREATE INDEX idx_metadata_path_name ON metadata (path, name);
 
---changeset chuckcha:added-index-path_name_type
+--changeset chuckcha:second_index-path_name_type-added
 CREATE INDEX idx_metadata_path_name_type ON metadata (path, name, type);
+
+--changeset chuckcha:created-root-folder-for-admin
+INSERT INTO metadata (path, name, size, type, created_at, modified_at)
+VALUES ('', 'user-1-files', null, 'DIRECTORY', NOW(), NOW());
+
+
 

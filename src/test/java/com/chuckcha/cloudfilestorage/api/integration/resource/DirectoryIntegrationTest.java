@@ -85,6 +85,7 @@ public class DirectoryIntegrationTest extends AbstractIntegrationTest {
         metadataService.save(request.fullPath().concat(TestFiles.TEXT_FILE.getOriginalFilename()), TestFiles.TEXT_FILE);
         metadataService.save(request.fullPath().concat(TestFiles.PDF_FILE.getOriginalFilename()), TestFiles.PDF_FILE);
         metadataService.createFolderIfNotExists(request.fullPath(), "emptyFolder");
+        resourceService.createFolders(userId, validDirectoryPath);
 
         ValidatableResponse response = given()
                 .cookies(cookies)

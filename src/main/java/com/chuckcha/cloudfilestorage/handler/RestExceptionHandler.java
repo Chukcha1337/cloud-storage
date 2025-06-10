@@ -3,7 +3,6 @@ package com.chuckcha.cloudfilestorage.handler;
 import com.chuckcha.cloudfilestorage.dto.response.ErrorResponse;
 import com.chuckcha.cloudfilestorage.exception.DataNotFoundException;
 import com.chuckcha.cloudfilestorage.exception.MinioDeleteObjectException;
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class RestExceptionHandler {
-
-    //TODO: Сделать единообразно - либо тут месседжи, либо в коде
 
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.CONFLICT)

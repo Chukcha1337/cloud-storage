@@ -1,13 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/cloud-filestorage
-    username: chuckcha
-    password: chuckcha
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         batch_size: 50
@@ -17,13 +17,13 @@ spring:
 
   data:
     redis:
-      host: localhost
+      host: ${REDIS_HOST}
       port: 6379
       timeout: 60000
 
 minio:
-  url: http://localhost:9000
-  access-key: chuckcha
-  secret-key: chuckcha
-  bucket-name: user-files
-  root-user-directory: user-%d-files/
+  url: ${MINIO_URL}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket-name: ${MINIO_BUCKET_NAME}
+  root-user-directory: ${MINIO_ROOT_USER_DIRECTORY}

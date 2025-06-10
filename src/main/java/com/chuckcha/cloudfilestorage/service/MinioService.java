@@ -1,12 +1,10 @@
 package com.chuckcha.cloudfilestorage.service;
 
 import com.chuckcha.cloudfilestorage.dto.request.path.MetadataRequest;
-import com.chuckcha.cloudfilestorage.exception.DataNotFoundException;
-import com.chuckcha.cloudfilestorage.exception.MinioDownloadException;
-import com.chuckcha.cloudfilestorage.exception.MinioMoveException;
-import com.chuckcha.cloudfilestorage.exception.MinioUploadException;
+import com.chuckcha.cloudfilestorage.exception.*;
 import com.chuckcha.cloudfilestorage.util.ZipStreamWriter;
 import io.minio.*;
+import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +61,6 @@ public class MinioService {
         }
     }
 
-
     public void writeFileToStream(String objectName, OutputStream outputStream) throws IOException {
         try (InputStream inputStream = minioClient.getObject(
                 GetObjectArgs.builder()
@@ -82,11 +79,22 @@ public class MinioService {
                 .map(DeleteObject::new)
                 .toList();
 
-        minioClient.removeObjects(
+        Iterable<Result<DeleteError>> results = minioClient.removeObjects(
                 RemoveObjectsArgs.builder()
                         .bucket(bucket)
                         .objects(toDelete)
                         .build());
+
+        for (Result<DeleteError> result : results) {
+            try {
+                DeleteError error = result.get();
+                if (error != null) {
+                    throw new MinioDeleteObjectException("Failed to delete object: %s, Message: %s".formatted(error.objectName(), error.message()));
+                }
+            } catch (Exception e) {
+                throw new MinioDeleteObjectException("Exception during deletion of MinIO object", e);
+            }
+        }
     }
 
     private List<String> listObjectNames(String prefix) {
@@ -101,10 +109,6 @@ public class MinioService {
             List<String> names = new ArrayList<>();
             for (Result<Item> result : results) {
                 names.add(result.get().objectName());
-            }
-
-            if (names.isEmpty()) {
-                throw new DataNotFoundException("No data found to list");
             }
             return names;
         } catch (Exception e) {

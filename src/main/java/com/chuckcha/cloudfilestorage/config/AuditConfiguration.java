@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @Configuration
 @EnableJpaAuditing
-//@EnableEnversRepositories(basePackageClasses = CloudFilestorageApplication.class)
 public class AuditConfiguration {
 
     @Bean
